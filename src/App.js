@@ -1,46 +1,65 @@
-import './App.css';
-import CurrentWeather from './components/currentWeather/CurrentWeather';
-import Searchbar from './components/searchbar/Searchbar';
-import { WEATHER_URL, WEATHER_API_KEY, FORCAST_URL } from './api';
-import { useEffect, useState } from 'react';
-import ForcastWeather from './components/forcastWeather/ForcastWeather';
+import "./App.css";
+import CurrentWeather from "./components/currentWeather/CurrentWeather";
+import Searchbar from "./components/searchbar/Searchbar";
+import { WEATHER_URL, WEATHER_API_KEY } from "./api"; // Removed FORCAST_URL (unused)
+import { useState } from "react"; // Only import what you use
+import ForcastWeather from "./components/forcastWeather/ForcastWeather";
 
 function App() {
-  const [currentWeather, setCurrentWeather] = useState(null)
-  const [forcastWeather, setForcastWeather] = useState(null)
-  const [img, setImg] = useState('bg')
-
+  const [currentWeather, setCurrentWeather] = useState(null);
+  const [forcastWeather, setForcastWeather] = useState(null);
+  const [img, setImg] = useState("default"); // fallback image
 
   const searchChangeHandler = (searchData) => {
-    let [lat, lon] = searchData.value.split(" ")
+    const [lat, lon] = searchData.value.split(" ");
 
-    const currentWeatherFetch = fetch(`${WEATHER_URL}/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`)
-    const forcastFetch = fetch(`${WEATHER_URL}/forecast?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`)
+    const currentWeatherFetch = fetch(
+      `${WEATHER_URL}/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
+    );
+    const forcastFetch = fetch(
+      `${WEATHER_URL}/forecast?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
+    );
 
     Promise.all([currentWeatherFetch, forcastFetch])
-      .then(async (response) => {
-        let currentWeatherResponse = await response[0].json();
-        let forcastResponse = await response[1].json();
+      .then(async ([currentRes, forcastRes]) => {
+        const currentWeatherResponse = await currentRes.json();
+        const forcastResponse = await forcastRes.json();
 
-        setCurrentWeather({ city: searchData.label, ...currentWeatherResponse })
-        setForcastWeather({ city: searchData.label, ...forcastResponse })
-        setImg(currentWeatherResponse.weather[0].main)
-      }).catch(err => console.log(err))
-  }
+        setCurrentWeather({
+          city: searchData.label,
+          ...currentWeatherResponse,
+        });
+        setForcastWeather({ city: searchData.label, ...forcastResponse });
 
-
+        // Safely get weather condition
+        const condition =
+          currentWeatherResponse.weather?.[0]?.main?.toLowerCase() || "default";
+        setImg(condition);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setImg("default"); // fallback on error
+      });
+  };
 
   return (
-    <div className='main' style={{ backgroundImage: `url("/backgrounds/${img}.jpg")`, backdropFilter: "brightness(50%)" }}>
+    <div
+      className="main"
+      style={{
+        backgroundImage: `url("/backgrounds/${img}.jpg")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+      }}
+    >
       <div className="weather-container">
         <Searchbar onSearchChange={searchChangeHandler} />
-        <div className='content'>
+        <div className="content">
           {currentWeather && <CurrentWeather data={currentWeather} />}
           {forcastWeather && <ForcastWeather data={forcastWeather} />}
         </div>
       </div>
     </div>
-
   );
 }
 
