@@ -1,0 +1,28 @@
+.main {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  backdrop-filter: brightness(50%);
+  margin: 0;
+  transition: all 0.5s linear;
+  overflow-x: hidden;
+}
+
+.weather-container {
+  max-width: 1089px;
+  flex-direction: column;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.content {
+  width: 100%;
+  max-width: 100vw;;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
