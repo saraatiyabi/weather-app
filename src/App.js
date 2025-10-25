@@ -8,7 +8,7 @@ import ForcastWeather from "./components/forcastWeather/ForcastWeather";
 function App() {
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forcastWeather, setForcastWeather] = useState(null);
-  const [img, setImg] = useState("default"); // fallback image
+  const [img, setImg] = useState("bg"); // fallback image
 
   const searchChangeHandler = (searchData) => {
     const [lat, lon] = searchData.value.split(" ");
@@ -33,12 +33,12 @@ function App() {
 
         // Safely get weather condition
         const condition =
-          currentWeatherResponse.weather?.[0]?.main?.toLowerCase() || "default";
+          currentWeatherResponse.weather?.[0]?.main?.toLowerCase() || "bg";
         setImg(condition);
       })
       .catch((err) => {
         console.error("Fetch error:", err);
-        setImg("default"); // fallback on error
+        setImg("bg"); // fallback on error
       });
   };
 
